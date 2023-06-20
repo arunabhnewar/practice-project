@@ -1,6 +1,8 @@
 // External imports
 const express = require('express');
 const cors = require('cors');
+const { readdirSync } = require("fs");
+const path = require("path");
 
 
 //Security Middleware Import
@@ -9,6 +11,10 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+
+
+// Internal imports
+const { notFoundHandler, errorHandler } = require('./src/middlewares/common/errorHandleMiddleware');
 
 
 
@@ -25,6 +31,7 @@ app.use(mongoSanitize());
 app.use(hpp());
 app.use(xss());
 
+
 //Request Rate Limiting
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minutes
@@ -34,6 +41,17 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
+
+
+
+// Routing middleware initialization
+
+
+// Not found handler
+app.use(notFoundHandler);
+
+// default error handler
+app.use(errorHandler);
 
 
 
