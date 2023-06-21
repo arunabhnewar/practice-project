@@ -14,7 +14,11 @@ const authVerifyMiddleware = async (req, res, next) => {
         }
 
     } catch (err) {
-        next(createError(401, err.message))
+        if (err.message === `invalid signature`) {
+            next(createError(401, 'Unauthorized User'))
+        } else {
+            next(createError(401, err.message))
+        };
     }
 };
 
