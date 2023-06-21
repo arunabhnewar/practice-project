@@ -25,7 +25,7 @@ const userSchema = mongoose.Schema({
         validate: {
             validator: function (email) {
                 // Regular expression for email validation
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
             },
             message: 'Invalid email address',

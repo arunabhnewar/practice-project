@@ -7,6 +7,14 @@ const otpSchema = mongoose.Schema({
         type: String,
         required: true,
         trim: true,
+        validate: {
+            validator: function (email) {
+                // Regular expression for email validation
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+            },
+            message: 'Invalid email address',
+        },
     },
     otp: {
         type: Number,
@@ -18,7 +26,7 @@ const otpSchema = mongoose.Schema({
         default: false,
     },
     expireIn: {
-        type: Date,
+        type: Number,
         required: true,
     },
 }, { timestamps: true });
