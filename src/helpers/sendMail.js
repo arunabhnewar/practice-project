@@ -2,7 +2,11 @@
 const nodemailer = require("nodemailer");
 
 
-const sendEmail = async (receiver, emailText, emailSubject) => {
+const sendEmail = async (mailInfo) => {
+
+    // destructure mailInfo
+    const { emailReceivers, emailText, emailSubject } = mailInfo;
+    const emailReceiver = emailReceivers.join(", ");
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
@@ -21,7 +25,7 @@ const sendEmail = async (receiver, emailText, emailSubject) => {
     // option
     const mailOptions = {
         from: process.env.EMAIL,  // sender address
-        to: receiver,             // list of receivers
+        to: emailReceiver,             // list of receivers
         subject: emailSubject,    // Subject line
         html: emailText,           // html body
     };
