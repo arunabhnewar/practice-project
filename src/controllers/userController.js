@@ -18,10 +18,6 @@ const userRegister = async (req, res, next) => {
         password: hashPassword,
     })
 
-    // const userInfo = req.body;
-    // const newUser = new User(userInfo);
-
-
     try {
         const result = await newUser.save();
 
@@ -70,22 +66,6 @@ const userLogin = async (req, res, next) => {
                 next(createError(404, "User not found"));
             }
         }
-
-        // const email = req.body["email"];
-        // const password = req.body["password"];
-
-        // query 
-        // let query = {
-        //     email: email, password: password
-        // };
-
-        // projection
-        // const projections = { "password": 0, "createdAt": 0, "updatedAt": 0 }
-
-        // find user
-        // const existingUser = await User.findOne(query, projections);
-
-
 
     } catch (err) {
         next(createError(400, err.message));
