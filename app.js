@@ -21,7 +21,7 @@ const { notFoundHandler, errorHandler } = require('./src/middlewares/common/erro
 // express app initialization
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 
 // Security middleware initialization
@@ -45,6 +45,7 @@ app.use(limiter);
 
 
 // Routing middleware initialization
+readdirSync('./src/routes').map(r => app.use(`/api/v1`, require(`./src/routes/${r}`)));
 
 
 // Not found handler

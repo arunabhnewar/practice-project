@@ -56,6 +56,11 @@ const userSchema = mongoose.Schema({
         min: 8,
         max: 64,
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
 }, { timestamps: true, versionKey: false });
 
 

@@ -36,3 +36,4 @@ const sendEmail = async (mailInfo) => {
 
 // Module Export
 module.exports = sendEmail;
+
