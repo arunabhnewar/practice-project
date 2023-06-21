@@ -1,7 +1,7 @@
 // External imports
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
-
+const bcrypt = require('bcrypt');
 
 
 // Internal imports
@@ -11,9 +11,18 @@ const User = require('../models/user');
 // user register controller
 const userRegister = async (req, res, next) => {
 
+    const hashPassword = await bcrypt.hash(req.body.password, 10);
+
+    const newUser = await new User({
+        ...req.body,
+        password: hashPassword,
+    })
+
+    // const userInfo = req.body;
+    // const newUser = new User(userInfo);
+
+
     try {
-        const userInfo = req.body;
-        const newUser = new User(userInfo);
         const result = await newUser.save();
 
         if (result._id && typeof result === 'object') {
@@ -40,35 +49,43 @@ const userRegister = async (req, res, next) => {
 // user login controller
 const userLogin = async (req, res, next) => {
     try {
-        const email = req.body["email"];
-        const password = req.body["password"];
+        const user = await User.findOne({ email: req.body.email });
+
+        if (user && user._id) {
+            const matchedPassword = await bcrypt.compare(req.body.password, user.password)
+
+            if (matchedPassword) {
+                // create token
+                const token = jwt.sign({
+                    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
+                    data: user
+                }, `${process.env.JWT_SECRET}`);
+
+                // send response after creating token
+                res.status(200).json({
+                    status: "success", token
+                });
+
+            } else {
+                next(createError(404, "User not found"));
+            }
+        }
+
+        // const email = req.body["email"];
+        // const password = req.body["password"];
 
         // query 
-        let query = {
-            email: email, password: password
-        };
+        // let query = {
+        //     email: email, password: password
+        // };
 
         // projection
-        const projections = { "password": 0, "createdAt": 0, "updatedAt": 0 }
+        // const projections = { "password": 0, "createdAt": 0, "updatedAt": 0 }
 
         // find user
-        const existingUser = await User.findOne(query, projections);
+        // const existingUser = await User.findOne(query, projections);
 
-        if (existingUser?._id && typeof existingUser === 'object') {
-            // create token
-            const token = jwt.sign({
-                exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
-                data: existingUser._id
-            }, `${process.env.JWT_SECRET}`);
 
-            // send response after creating token
-            res.status(200).json({
-                status: "success", token
-            });
-
-        } else {
-            next(createError(404, "User not found"));
-        }
 
     } catch (err) {
         next(createError(400, err.message));
