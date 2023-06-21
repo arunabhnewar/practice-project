@@ -2,7 +2,8 @@
 const express = require('express');
 
 // Internal imports
-const { userRegister, userLogin } = require('../controllers/userController');
+const { userRegister, userLogin, getUserDetails } = require('../controllers/userController');
+const authVerifyMiddleware = require('../middlewares/authVerifyMiddleware');
 
 
 
@@ -14,6 +15,10 @@ router.post('/register', userRegister);
 
 // user login
 router.post('/login', userLogin);
+
+
+// user profile details
+router.get('/profile-details', authVerifyMiddleware, getUserDetails)
 
 
 // module exports

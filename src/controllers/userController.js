@@ -72,5 +72,36 @@ const userLogin = async (req, res, next) => {
     }
 }
 
+
+// profile controller
+const getUserDetails = async (req, res, next) => {
+    try {
+        // query
+        const query = { email: req?.email };
+
+        // projection
+        const projection = { _id: 0, "password": 0, "createdAt": 0, "updatedAt": 0 };
+
+        // find user
+        const user = await User.findOne(query, projection);
+
+        // 
+        if (user.email && typeof user === 'object') {
+            res.status(200).json({
+                status: "success", data: user
+            });
+
+        } else {
+            next(createError(400, "Internal server error"));
+        }
+
+    } catch (err) {
+        next(createError(404, err.message));
+    }
+};
+
+
+
+
 // Module exports
-module.exports = { userRegister, userLogin };
+module.exports = { userRegister, userLogin, getUserDetails };
