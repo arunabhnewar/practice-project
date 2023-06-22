@@ -10,7 +10,7 @@ const User = require('../models/user');
 
 // user register controller
 const userRegister = async (req, res, next) => {
-
+    // user password encrypted
     const hashPassword = await bcrypt.hash(req.body.password, 10);
 
     const newUser = await new User({
@@ -80,7 +80,7 @@ const getUserDetails = async (req, res, next) => {
         const query = { email: req?.email };
 
         // projection
-        const projection = { _id: 0, "password": 0, "createdAt": 0, "updatedAt": 0 };
+        const projection = { _id: 0, "password": 0, "isVerified": 0, "createdAt": 0, "updatedAt": 0 };
 
         // find user
         const user = await User.findOne(query, projection);
@@ -102,6 +102,32 @@ const getUserDetails = async (req, res, next) => {
 
 
 
+// profile update controller
+const updateProfile = async (req, res, next) => {
+
+    try {
+        // query
+        const email = req?.email;
+        // return console.log(email);
+        const { username, address } = req.body;
+
+        // update user
+        const user = await User.updateOne({ email }, { $set: { username: username, address: address } }, { upsert: true, new: true });
+
+        if (!user) {
+            res.status(400).json({
+                status: "failed", data: "User update failed!!"
+            });
+        } else {
+            res.status(200).json({ status: "success", data: user })
+        }
+
+    } catch (err) {
+
+        next(createError(404, err.message));
+    }
+}
+
 
 // Module exports
-module.exports = { userRegister, userLogin, getUserDetails };
+module.exports = { userRegister, userLogin, getUserDetails, updateProfile };
