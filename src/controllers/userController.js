@@ -36,6 +36,7 @@ const userRegister = async (req, res, next) => {
             // send a verification link
             const mailVerificationLink = await sendEmail(mailInfo);
 
+            // Response after sending mail
             if (mailVerificationLink?.messageId) {
                 res.status(200).json({
                     status: "success", data: result, message: "Verification link was send"
