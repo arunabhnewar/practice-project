@@ -25,7 +25,7 @@ const sendEmail = async (mailInfo) => {
     // option
     const mailOptions = {
         from: process.env.EMAIL,  // sender address
-        to: emailReceiver,             // list of receivers
+        to: emailReceiver,        // list of receivers
         subject: emailSubject,    // Subject line
         html: emailText,           // html body
     };

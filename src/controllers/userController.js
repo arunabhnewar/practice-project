@@ -6,25 +6,44 @@ const bcrypt = require('bcrypt');
 
 // Internal imports
 const User = require('../models/user');
+const sendEmail = require('../helpers/sendMail');
 
 
 // user register controller
 const userRegister = async (req, res, next) => {
-    // user password encrypted
-    const hashPassword = await bcrypt.hash(req.body.password, 10);
 
-    const newUser = await new User({
-        ...req.body,
-        password: hashPassword,
-    })
+    let userId;
 
     try {
-        const result = await newUser.save();
+        // user password encrypted
+        const hashPassword = await bcrypt.hash(req.body.password, 10);
 
-        if (result._id && typeof result === 'object') {
-            res.status(200).json({
-                status: "success", data: result
-            })
+        // new user create
+        const newUser = await new User({
+            ...req.body,
+            password: hashPassword,
+        });
+
+        const result = await newUser.save();
+        userId = result._id;
+
+        // send verification link after create a user
+        if (result?._id && typeof result === 'object') {
+
+            // email info
+            const mailInfo = { emailReceivers: [result?.email], emailText: `Verify this link => http://localhost:3000/api/v1/verifyUser/${result?._id}`, emailSubject: `Verify your account` };
+
+            // send a verification link
+            const mailVerificationLink = await sendEmail(mailInfo);
+
+            if (mailVerificationLink?.messageId) {
+                res.status(200).json({
+                    status: "success", data: result, message: "Verification link was send"
+                })
+            } else {
+                next(createError(500, "User was not created. Please try again"));
+            }
+
         } else {
             res.status(400).json({
                 status: "failed", data: "Internal server error!!"
@@ -35,11 +54,39 @@ const userRegister = async (req, res, next) => {
         if (err.message.includes(`E11000 duplicate key error collection`)) {
             next(createError(409, `User already exists`))
         } else {
+            await User.findByIdAndDelete(userId);
             next(createError(400, err.message));
         }
     }
 };
 
+
+// Verify email controller
+const verifyEmail = async (req, res, next) => {
+    try {
+        const _id = req.params.id;
+        const user = await User.findOne({ _id }, { isVerified: 1 });
+
+        if (user?.isVerified) {
+            res.status(200).json({
+                message: "User already verified",
+            });
+        } else {
+            const updateUser = await User.findOneAndUpdate({ _id }, { $set: { isVerified: true } }, { new: true });
+
+            if (updateUser?._id && updateUser.isVerified) {
+                res.status(200).json({
+                    status: "updated", data: updateUser
+                })
+            } else {
+                next(createError(400, "User could not verified"))
+            }
+        }
+
+    } catch (err) {
+        next(createError(400, err.message));
+    }
+}
 
 
 // user login controller
@@ -129,5 +176,8 @@ const updateProfile = async (req, res, next) => {
 }
 
 
+
+
+
 // Module exports
-module.exports = { userRegister, userLogin, getUserDetails, updateProfile };
+module.exports = { userRegister, userLogin, getUserDetails, updateProfile, verifyEmail };
