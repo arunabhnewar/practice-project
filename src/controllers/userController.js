@@ -156,7 +156,7 @@ const updateProfile = async (req, res, next) => {
     try {
         // query
         const email = req?.email;
-        // return console.log(email);
+
         const { username, address } = req.body;
 
         // update user
