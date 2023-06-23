@@ -18,6 +18,7 @@ const taskSchema = mongoose.Schema({
     },
     status: {
         type: String,
+        required: true,
     }
 }, { timestamps: true, versionKey: false });
 
