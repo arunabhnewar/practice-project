@@ -8,7 +8,7 @@ const Task = require('../models/task');
 
 
 // Create task controller
-const createNewTask = async (req, res) => {
+const createNewTask = async (req, res, next) => {
 
     try {
         // query
@@ -41,9 +41,25 @@ const createNewTask = async (req, res) => {
 
 
 
+// Delete task controller
+const deleteTask = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = { _id: id };
+
+        const result = await Task.findByIdAndDelete(query);
+
+        res.status(200).json({
+            status: "success", data: result
+        });
+
+    } catch (err) {
+        next(createError(400, err.message));
+    }
+}
 
 
 
 
 // Module exports
-module.exports = { createNewTask };
+module.exports = { createNewTask, deleteTask };
