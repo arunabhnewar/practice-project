@@ -64,10 +64,10 @@ const updateTask = async (req, res, next) => {
         // query
         const id = req?.params.id;
         const query = { _id: id };
-        const { title, description, status } = req.body;
+        const { status } = req.body;
 
         // update a task
-        const result = await Task.updateOne(query, { $set: { title: title, description: description, status: status } }, { upsert: true, new: true });
+        const result = await Task.updateOne(query, { $set: { status: status } }, { upsert: true, new: true });
 
         // response after task was updated
         if (!result) {
@@ -85,14 +85,33 @@ const updateTask = async (req, res, next) => {
 
 
 // update task by list controller
-const taskListUpdate = async (req, res, next) => {
+const taskListSearch = async (req, res, next) => {
+
     try {
+        // query
+        const status = { status: req?.query?.status };
+
+        // task list find 
+        const taskList = await Task.find(status);
+
+        // response after searched task list
+        if (taskList.length > 0 && typeof taskList === 'object') {
+            res.status(200).json({
+                status: 'success',
+                data: taskList
+            })
+        } else {
+            res.status(200).json({
+                status: 'failed',
+                data: "No task found on your request"
+            })
+        }
 
     } catch (err) {
-
+        next(createError(404, err.message));
     }
 }
 
 
 // Module exports
-module.exports = { createNewTask, deleteTask, updateTask, taskListUpdate };
+module.exports = { createNewTask, deleteTask, updateTask, taskListSearch };

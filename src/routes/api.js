@@ -7,7 +7,7 @@ const express = require('express');
 const { userRegister, userLogin, getUserDetails, updateProfile, verifyEmail } = require('../controllers/userController');
 const authVerifyMiddleware = require('../middlewares/authVerifyMiddleware');
 const { sendOTP, verifyOTP } = require('../controllers/otpController');
-const { createNewTask, deleteTask, updateTask } = require('../controllers/taskController');
+const { createNewTask, deleteTask, updateTask, taskListSearch } = require('../controllers/taskController');
 
 
 const router = express.Router();
@@ -39,10 +39,14 @@ router.post('/otp-verify', verifyOTP);
 router.post('/add-task', authVerifyMiddleware, createNewTask);
 
 // delete a task
-router.post('/delete-task/:id', authVerifyMiddleware, deleteTask);
+router.delete('/delete-task/:id', authVerifyMiddleware, deleteTask);
 
 // update a task
-router.post('/update-task/:id', authVerifyMiddleware, updateTask);
+router.put('/update-task/:id', authVerifyMiddleware, updateTask);
+
+// search a task
+router.get('/search-task', authVerifyMiddleware, taskListSearch)
+
 
 
 // module exports

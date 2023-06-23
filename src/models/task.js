@@ -18,7 +18,10 @@ const taskSchema = mongoose.Schema({
     },
     status: {
         type: String,
+        trim: true,
         required: true,
+        enum: ['pending', 'in-progress', 'completed'],
+        default: 'pending'
     }
 }, { timestamps: true, versionKey: false });
 
